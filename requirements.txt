@@ -1,0 +1,14 @@
+# DeskPilot Requirements
+# Python 3.8+
+
+# Browser automation
+playwright>=1.40.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Web framework for GUI
+flask>=2.3.0
+
+# Note: Ollama must be installed and running separately
+# See Instructions.md for setup details

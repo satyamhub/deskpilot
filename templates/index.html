@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🤖 DeskPilot - AI Autopilot Browser Agent</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        margin-bottom: 20px;
+      }
+
+      .input-section {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      button {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c0392b;
+      }
+
+      .plan-section {
+        margin-top: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .plan-section.active {
+        display: block;
+      }
+
+      .plan-title {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .step-item {
+        background: white;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #667eea;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .step-action {
+        font-weight: 600;
+        color: #667eea;
+        min-width: 100px;
+      }
+
+      .step-detail {
+        color: #666;
+        flex: 1;
+        margin-left: 15px;
+      }
+
+      .status-bar {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-align: center;
+        font-weight: 600;
+        display: none;
+      }
+
+      .status-bar.active {
+        display: block;
+      }
+
+      .status-planning {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-ready {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      .status-executing {
+        background: #cfe2ff;
+        color: #084298;
+      }
+
+      .status-completed {
+        background: #d1e7dd;
+        color: #0f5132;
+      }
+
+      .status-error {
+        background: #f8d7da;
+        color: #842029;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+      }
+
+      .history-section {
+        margin-top: 30px;
+      }
+
+      .history-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .history-item {
+        background: #f8f9fa;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .history-command {
+        flex: 1;
+      }
+
+      .history-command-text {
+        font-weight: 500;
+        color: #333;
+      }
+
+      .history-command-time {
+        font-size: 0.9em;
+        color: #999;
+      }
+
+      .history-status {
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: 600;
+      }
+
+      .history-status.success {
+        background: #d1e7dd;
+        color: #0f5132;
+      }
+
+      .history-status.error {
+        background: #f8d7da;
+        color: #842029;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: #999;
+        padding: 40px 20px;
+      }
+
+      .empty-state-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-radius: 50%;
+        border-top-color: #667eea;
+        animation: spin 0.6s linear infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .placeholder-text {
+        color: #999;
+        font-style: italic;
+      }
+
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.8em;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .input-section {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🤖 DeskPilot</h1>
+        <p>AI Autopilot Browser Agent</p>
+      </header>
+
+      <div class="card">
+        <!-- Status Bar -->
+        <div id="status" class="status-bar"></div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+          <input
+            type="text"
+            id="commandInput"
+            placeholder="Enter a command: 'Open YouTube and search for Python tutorials'..."
+            onkeypress="handleKeyPress(event)"
+          />
+          <button class="btn-primary" id="planBtn" onclick="planCommand()">
+            <span id="planBtnText">Generate Plan</span>
+          </button>
+        </div>
+
+        <!-- Plan Section -->
+        <div id="planSection" class="plan-section">
+          <div class="plan-title">📋 Generated Plan</div>
+          <div id="planSteps"></div>
+
+          <div class="action-buttons">
+            <button
+              class="btn-primary"
+              id="executeBtn"
+              onclick="executeCommand()"
+            >
+              ▶️ Execute
+            </button>
+            <button
+              class="btn-danger"
+              id="cancelBtn"
+              onclick="cancelTask()"
+              style="display: none"
+            >
+              ⏹️ Kill Task
+            </button>
+            <button class="btn-secondary" id="resetBtn" onclick="resetPlan()">
+              ↺ New Command
+            </button>
+          </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="historySection" class="history-section">
+          <div class="history-title">📜 Execution History</div>
+          <div id="history"></div>
+          <div id="emptyHistory" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No tasks completed yet</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          text-align: center;
+          color: white;
+          margin-top: 20px;
+          font-size: 0.9em;
+        "
+      >
+        <p>
+          💡 Tip: Make sure Ollama is running with
+          <code
+            style="
+              background: rgba(0, 0, 0, 0.3);
+              padding: 2px 6px;
+              border-radius: 3px;
+            "
+            >ollama run llama3</code
+          >
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "/api";
+
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          planCommand();
+        }
+      }
+
+      async function planCommand() {
+        const command = document.getElementById("commandInput").value.trim();
+
+        if (!command) {
+          showStatus("error", "⚠️ Please enter a command");
+          return;
+        }
+
+        document.getElementById("planBtn").disabled = true;
+        document.getElementById("planBtnText").innerHTML =
+          '<span class="spinner"></span>Planning...';
+
+        showStatus("planning", "🧠 Generating plan from command...");
+
+        try {
+          const response = await fetch(`${API_BASE}/plan`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ command }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            showStatus("error", `❌ ${data.error}`);
+            document.getElementById("planBtn").disabled = false;
+            document.getElementById("planBtnText").innerHTML = "Generate Plan";
+            return;
+          }
+
+          displayPlan(data.plan);
+          showStatus("ready", `✅ Plan ready: ${data.steps} steps`);
+          document.getElementById("planSection").classList.add("active");
+        } catch (error) {
+          showStatus("error", `❌ Error: ${error.message}`);
+        } finally {
+          document.getElementById("planBtn").disabled = false;
+          document.getElementById("planBtnText").innerHTML = "Generate Plan";
+        }
+      }
+
+      function displayPlan(plan) {
+        const planSteps = document.getElementById("planSteps");
+        planSteps.innerHTML = "";
+
+        plan.forEach((step, index) => {
+          const stepDiv = document.createElement("div");
+          stepDiv.className = "step-item";
+
+          const action = step.action || "unknown";
+          const detail = step.target || step.query || step.text || "";
+
+          stepDiv.innerHTML = `
+                    <div class="step-action">Step ${index + 1}: ${action}</div>
+                    <div class="step-detail">${detail || '<span class="placeholder-text">No additional parameters</span>'}</div>
+                `;
+
+          planSteps.appendChild(stepDiv);
+        });
+      }
+
+      async function executeCommand() {
+        document.getElementById("executeBtn").disabled = true;
+        document.getElementById("executeBtn").style.display = "none";
+        document.getElementById("cancelBtn").style.display = "inline-block";
+        document.getElementById("resetBtn").disabled = true;
+        showStatus("executing", "⏳ Executing plan...");
+
+        try {
+          const response = await fetch(`${API_BASE}/execute`, {
+            method: "POST",
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            showStatus("error", `❌ ${data.error}`);
+            return;
+          }
+
+          // Poll status
+          pollExecutionStatus();
+        } catch (error) {
+          showStatus("error", `❌ Error: ${error.message}`);
+          document.getElementById("executeBtn").disabled = false;
+        }
+      }
+
+      async function pollExecutionStatus() {
+        let retries = 0;
+        const maxRetries = 300; // 5 minutes max
+
+        const poll = async () => {
+          try {
+            const response = await fetch(`${API_BASE}/status`);
+            const data = await response.json();
+
+            if (data.running) {
+              retries++;
+              if (retries < maxRetries) {
+                setTimeout(poll, 1000);
+              }
+            } else {
+              // Execution complete
+              if (data.status === "completed") {
+                showStatus("completed", "✅ Task completed successfully!");
+              } else if (data.status === "completed_with_errors") {
+                showStatus("error", "⚠️ Task completed with errors");
+              } else if (data.status === "cancelled") {
+                showStatus("error", "🛑 Task cancelled");
+              } else {
+                showStatus("error", `❌ ${data.status}`);
+              }
+
+              document.getElementById("executeBtn").disabled = false;
+              document.getElementById("executeBtn").style.display =
+                "inline-block";
+              document.getElementById("cancelBtn").style.display = "none";
+              document.getElementById("resetBtn").disabled = false;
+              loadHistory();
+            }
+          } catch (error) {
+            console.error("Poll error:", error);
+            retries++;
+            if (retries < maxRetries) {
+              setTimeout(poll, 2000);
+            }
+          }
+        };
+
+        poll();
+      }
+
+      function resetPlan() {
+        document.getElementById("commandInput").value = "";
+        document.getElementById("planSection").classList.remove("active");
+        document.getElementById("status").classList.remove("active");
+        document.getElementById("executeBtn").style.display = "inline-block";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("executeBtn").disabled = false;
+        document.getElementById("resetBtn").disabled = false;
+        document.getElementById("commandInput").focus();
+      }
+
+      function showStatus(type, message) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.className = `status-bar active status-${type}`;
+        statusDiv.textContent = message;
+      }
+
+      async function loadHistory() {
+        try {
+          const response = await fetch(`${API_BASE}/history`);
+          const data = await response.json();
+          displayHistory(data.history);
+        } catch (error) {
+          console.error("Error loading history:", error);
+        }
+      }
+
+      function displayHistory(history) {
+        const historyDiv = document.getElementById("history");
+        const emptyHistory = document.getElementById("emptyHistory");
+
+        if (history.length === 0) {
+          historyDiv.innerHTML = "";
+          emptyHistory.style.display = "block";
+          return;
+        }
+
+        emptyHistory.style.display = "none";
+        historyDiv.innerHTML = "";
+
+        history
+          .slice()
+          .reverse()
+          .forEach((item) => {
+            const historyItem = document.createElement("div");
+            historyItem.className = "history-item";
+
+            const date = new Date(item.timestamp).toLocaleString();
+            const statusClass = item.success ? "success" : "error";
+            const statusText = item.success ? "✅ Success" : "❌ Failed";
+
+            historyItem.innerHTML = `
+                    <div class="history-command">
+                        <div class="history-command-text">${item.command}</div>
+                        <div class="history-command-time">${date} • ${item.steps} steps</div>
+                    </div>
+                    <div class="history-status ${statusClass}">${statusText}</div>
+                `;
+
+            historyDiv.appendChild(historyItem);
+          });
+      }
+
+      // Load history on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        loadHistory();
+        document.getElementById("commandInput").focus();
+      });
+
+      async function cancelTask() {
+        document.getElementById("cancelBtn").disabled = true;
+        showStatus("executing", "🛑 Cancelling task...");
+
+        try {
+          const response = await fetch(`${API_BASE}/cancel`, {
+            method: "POST",
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showStatus("error", "🛑 Task cancelled by user");
+          } else {
+            showStatus("error", `❌ ${data.error}`);
+          }
+
+          // Reset UI
+          setTimeout(() => {
+            document.getElementById("executeBtn").style.display =
+              "inline-block";
+            document.getElementById("cancelBtn").style.display = "none";
+            document.getElementById("executeBtn").disabled = false;
+            document.getElementById("resetBtn").disabled = false;
+            loadHistory();
+          }, 500);
+        } catch (error) {
+          showStatus("error", `❌ Error cancelling task: ${error.message}`);
+          document.getElementById("cancelBtn").disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>
